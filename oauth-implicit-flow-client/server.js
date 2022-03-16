@@ -17,20 +17,18 @@ router.get("/auth", async (req, res) => {
     res.redirect(utils.request_get_auth_code_url);
   } catch (error) {
     res.sendStatus(500);
-    console.log(error.message);
+    console.error(error.message);
   }
 });
 
 router.get("/redirected", async (req, res) => {});
 
 router.get("/login/oauth/callback", async (req, res) => {
-  console.log("serving redirect html" + JSON.stringify(req.query));
   res.sendFile(path.join(__dirname, "/public/OAuthRedirect.html"));
 });
 
 router.get("/login/callback", async (req, res) => {
-  console.log(JSON.stringify(req.query));
   res.sendFile(path.join(__dirname, "/public/Greetings.html"));
 });
 
-router.listen(port, () => console.log("running server on: " + port));
+router.listen(port, () => console.log("Running server on port: " + port));
