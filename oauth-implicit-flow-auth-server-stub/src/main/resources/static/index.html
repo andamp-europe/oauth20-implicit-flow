@@ -4,18 +4,18 @@
     <meta charset="UTF-8">
     <title>Andamp OAuth2 Authentication Server</title>
     <script type="text/javascript">
-        function authorize(){
+        function redirect(){
             const queryString = window.location.search;
             const urlParams = new URLSearchParams(queryString);
+            const uri="http://localhost:8080/oauth/authorization?" + urlParams;
 
-            fetch('http://localhost:8080/oauth/authorization?' + urlParams)
+            window.location.href = uri;
         }
     </script>
 </head>
 <body>
-    <div>
-        <h1>Login with OAuth2</h1>
-        <input type="button" onclick="authorize()" value="Authorize Login">
-    </div>
+    <h1>Login with OAuth2</h1>
+    <p>Click on Authorize Login to proceed</p>
+    <input type="button"  value="Authorize Login" onclick="redirect()">
 </body>
 </html>
