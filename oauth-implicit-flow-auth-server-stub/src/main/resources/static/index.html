@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <title>Andamp OAuth2 Authentication Server</title>
     <script type="text/javascript">
-    function authorize(){
-        const queryString = window.location.search;
-        const urlParams = new URLSearchParams(queryString);
+        function authorize(){
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
 
-        fetch('http://localhost:8080/oauth2/authorization2?' + urlParams)
-    }
+            fetch('http://localhost:8080/oauth2/authorization2?' + urlParams)
+        }
     </script>
 </head>
 <body>
