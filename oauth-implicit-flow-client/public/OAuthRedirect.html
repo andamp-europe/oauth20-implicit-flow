@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>OAuth 2.0 implicit grant flow redirect</title>
+  </head>
+
+  <body>
+    <script>
+      let callback = window.location.href;
+      callback = callback.replace("#", "?");
+      callback = callback.replace("oauth/", "");
+      window.location.href = callback;
+    </script>
+  </body>
+</html>
