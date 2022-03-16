@@ -4,6 +4,9 @@ const path = require("path");
 const cors = require("cors");
 const port = 8082;
 const router = express();
+
+let token_for_further_processes = "";
+
 router.use(express.static(__dirname + "/public"));
 router.use(
   cors({
@@ -28,6 +31,13 @@ router.get("/login/oauth/callback", async (req, res) => {
 });
 
 router.get("/login/callback", async (req, res) => {
+  const queryString = req.query;
+  if (!req.query) {
+    res.status(404);
+    res.send("No Access Token provided");
+  }
+  token_for_further_processes = queryString.access_token;
+
   res.sendFile(path.join(__dirname, "/public/Greetings.html"));
 });
 
