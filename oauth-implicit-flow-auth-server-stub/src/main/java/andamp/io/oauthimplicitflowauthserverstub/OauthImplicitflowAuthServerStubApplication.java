@@ -10,6 +10,4 @@ public class OauthImplicitflowAuthServerStubApplication {
 		SpringApplication.run(OauthImplicitflowAuthServerStubApplication.class, args);
 	}
 
-
-
 }

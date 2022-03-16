@@ -3,12 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <title>Andamp OAuth2 Authentication Server</title>
+    <script type="text/javascript">
+    function authorize(){
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
 
+        fetch('http://localhost:8080/oauth2/authorization2?' + urlParams)
+    }
+    </script>
 </head>
 <body>
     <div>
         <h1>Login with OAuth2</h1>
-        <button>Authorize</button>
+        <input type="button" onclick="authorize()" value="Authorize Login">
     </div>
 </body>
 </html>
