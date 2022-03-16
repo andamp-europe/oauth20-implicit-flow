@@ -26,7 +26,7 @@ public class Authorization {
     @ResponseBody
     public ResponseEntity<Void> authorize2(@RequestParam String response_type, @RequestParam String client_id, @RequestParam String redirect_uri, @RequestParam String scope, @RequestParam String state){
         System.out.println("Received params: response_type:" + response_type + "clientID:  "+client_id+" scope: " + scope +" state: "+ state);
-        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(redirect_uri+"?state="+state+"&access_token="+access_token_stub+"&token_type=bearer"+
+        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(redirect_uri+"#state="+state+"&access_token="+access_token_stub+"&token_type=bearer"+
                 "&expires_in=900")).build();
     }
 }
