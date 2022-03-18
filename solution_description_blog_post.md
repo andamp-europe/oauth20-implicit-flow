@@ -53,7 +53,7 @@ router.use(express.static(__dirname + "/public"));
 router.use(
 cors({
 origin: ["http://localhost:8080", "http://localhost:8082"]}));
-const  state = "8njkfds893ksHSD3bd";
+const  state = process.env.STATE;
 
 router.get("/auth", async (req, res) => {
 	try {
@@ -136,6 +136,53 @@ router.get("/login/callback", async (req, res) => {
 });
 ```
 Now we can directly access our query parameters over our request object and access the access_token for further processing. We then show a simply greeting to indicate that we have successfully fulfilled the OAuth2.0 Implicit Grant flow.
+
+
+## Improvements and Future Work
+The main goal of OAuth2.0 is securely authenticating requests. Until now, we concentrated on showing how our solution work so that you can build your secure applications on top of it. Therefore we tried to use as little of dependencies as possible. Let's go a step further and add [passport.js](https://www.npmjs.com/package/passport) to our project. It will authenticate the JWT token that we receive from the server and make sure that conditions that we specify are met and the signature of the token is valid. For this purpose, we need to first download passport and the passport strategy that we will be using called  [passport-jwt](https://www.passportjs.org/packages/passport-jwt/). 
+ `npm i passport passport-jwt`
+ 
+ In the server.js file, add the following code at the top: 
+```javascript
+    const  passport = require("passport");
+    const  JwtStrategy = require("passport-jwt").Strategy;
+    const  ExtractJwt = require("passport-jwt").ExtractJwt;
+    
+
+    const  opts = {};
+    const  shared_secret = process.env.SHARED_SECRET;
+    opts.jwtFromRequest = ExtractJwt.fromUrlQueryParameter("access_token");
+    opts.secretOrKey = shared_secret;
+```
+The shared secret is exchanged between your client and the authentication server in a previous setup. Passport.js will use this key to verify the signature of the token that has been sent by the server. 
+
+passport.js is our base dependency and we are using the strategy passport-jwt additionally to verify tokens. Now we need to create a new JwtStrategy with our defined options and tell passport.js to use it. We achieve this with the following code:
+```javascript
+passport.use(
+	new  JwtStrategy(opts, function (jwt_payload, done) {
+		try {
+			return  done(null, jwt_payload.user);
+		} catch (error) {
+			return  done(error);
+		}
+	})
+);
+```
+As a last step, we add our configured passport authentication to the corresponding endpoint:
+
+```javascript
+router.get("/login/callback", passport.authenticate("jwt", { session:  false }),
+	async (req, res, next) => {
+				.
+				.
+				.
+	res.sendFile(path.join(__dirname, "/public/Greetings.html"));
+	}
+)
+```
+Now, when we receive the token from the authentication server, passport.js will verify its signature with the shared key and ensure it's validity. If a token with an invalid signature is received, passport.js throws an error.  We can add further checks to our opts object and passport.jws will validate against them. 
+
+As a future project, we would like to implement the solution presented in this article into a passport.js strategy. 
 
 ## Conclusion
 In this blog post we implement a workaround for a problem that arises when receiving an access token using the OAuth2.0 Implicit Grant flow with a NodeJS back-end. Since the Implicit Grant flow relies on redirects between Browser based agents, we need to catch the request in the context of Browser JavaScript. We then replace the fragment with a question mark and call the appropriate endpoint for further processing. 
