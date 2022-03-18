@@ -1,11 +1,31 @@
+require("dotenv").config();
 const express = require("express");
-const path = require("path");
 const cors = require("cors");
+const path = require("path");
 const utils = require("./utils");
 const router = express();
-const port = 8082;
+const passport = require("passport");
 
-const state = "8njkfds893ksHSD3bd";
+const shared_secret = process.env.SHARED_SECRET;
+const JwtStrategy = require("passport-jwt").Strategy;
+const ExtractJwt = require("passport-jwt").ExtractJwt;
+const opts = {};
+opts.jwtFromRequest = ExtractJwt.fromUrlQueryParameter("access_token");
+opts.secretOrKey = shared_secret;
+
+const state = process.env.STATE;
+
+passport.use(
+  new JwtStrategy(opts, function (jwt_payload, done) {
+    try {
+      return done(null, jwt_payload.user);
+    } catch (error) {
+      return done(error);
+    }
+  })
+);
+
+const port = 8082;
 
 router.use(express.static(__dirname + "/public"));
 router.use(
@@ -27,22 +47,26 @@ router.get("/login/oauth/callback", async (req, res) => {
   res.sendFile(path.join(__dirname, "/public/OAuthRedirect.html"));
 });
 
-router.get("/login/callback", async (req, res) => {
-  const queryString = req.query;
-  if (!req.query) {
-    return res.status(404).send("No Access Token provided");
-  }
+router.get(
+  "/login/callback",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    const queryString = req.query;
+    if (!req.query) {
+      return res.status(404).send("No Access Token provided");
+    }
 
-  if (state !== queryString.state) {
-    return res
-      .status(401)
-      .send(
-        "The state variables did not match. Could not identify response validity."
-      );
-  }
-  let token_for_further_processes = queryString.access_token;
+    if (state !== queryString.state) {
+      return res
+        .status(401)
+        .send(
+          "The state variables did not match. Could not identify response validity."
+        );
+    }
+    let token_for_further_processes = queryString.access_token;
 
-  res.sendFile(path.join(__dirname, "/public/Greetings.html"));
-});
+    res.sendFile(path.join(__dirname, "/public/Greetings.html"));
+  }
+);
 
 router.listen(port, () => console.log("Running server on port: " + port));
